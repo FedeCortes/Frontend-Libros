@@ -1,58 +1,90 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
-  </div>
+  <v-container>
+    <v-row justify="center">
+      <v-col cols="12" md="8">
+        <h1 class="text-h5">Lista de tareas</h1>
+        <v-btn @click="addTask" color="primary">Agregar tarea</v-btn>
+
+        <v-row v-if="agregar" class="mt-2">
+          <v-col cols="12">
+            <v-text-field v-model="newTask" label="Nueva Tarea"></v-text-field>
+          </v-col>
+          <v-col cols="12" class="mt-2">
+            <v-btn @click="addNewTask" color="success">Guardar</v-btn>
+          </v-col>
+        </v-row>
+
+        <v-list class="mt-4">
+          <v-list-item-group v-if="tasks.length > 0">
+            <v-list-item v-for="(task, index) in tasks" :key="index">
+              <v-list-item-content>
+                <v-list-item-title v-if="isEditing(index)">
+                  <v-text-field v-model="tasks[index]" outlined></v-text-field>
+                  <v-btn @click="updateTaskOk" color="success" >Guardar</v-btn>
+                </v-list-item-title>
+                <v-list-item-title v-else>
+                  {{ task }}
+                </v-list-item-title>
+              </v-list-item-content>
+
+              <v-list-item-action>
+                <v-btn @click="updateTask(index)" icon>
+                  <v-icon>mdi-pencil</v-icon>
+                </v-btn>
+              </v-list-item-action>
+
+              <v-list-item-action>
+                <v-btn @click="deleteTask(index)" icon>
+                  <v-icon>mdi-delete</v-icon>
+                </v-btn>
+              </v-list-item-action>
+            </v-list-item>
+          </v-list-item-group>
+          <v-list-item v-else>
+            <v-list-item-content>No hay tareas</v-list-item-content>
+          </v-list-item>
+        </v-list>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
 export default {
-  name: 'HelloWorld',
-  props: {
-    msg: String
-  }
-}
+  data() {
+    return {
+      tasks: ["Tarea 1", "Tarea 2", "Tarea 3"],
+      newTask: "",
+      agregar: false,
+      editingIndex: null
+    };
+  },
+  methods: {
+    addTask() {
+      this.newTask = "";
+      this.agregar = true;
+    },
+    addNewTask() {
+      if (this.newTask.trim() !== "") {
+        this.tasks.push(this.newTask);
+        this.newTask = "";
+        this.agregar = false;
+      }
+    },
+    updateTask(index) {
+      this.editingIndex = index;
+    },
+    updateTaskOk() {
+      this.editingIndex = null;
+    },
+    deleteTask(index) {
+      this.tasks.splice(index, 1);
+      this.editingIndex = null;
+    },
+    isEditing(index) {
+      return this.editingIndex === index;
+    }
+  },
+  mounted() {}
+};
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
-</style>
